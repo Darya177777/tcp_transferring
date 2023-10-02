@@ -1,0 +1,8 @@
+Examples of using:
+python tcp_server.py 8080
+python tcp_client.py input.txt 192.168.1.105 8080
+
+Server program needs one argument for running: port;
+Client program needs three arguments for running: name of file, ip address and port.
+This program transfers a file from one computer to another.
+Client send file to server, and server receive it and save in uploads/
