@@ -2,7 +2,7 @@ import socket
 from sys import argv
 import os
 
-megabyte = 1024 * 1024
+gigabyte = 1024 * 1024 * 1024
 
 
 def client():
@@ -11,21 +11,21 @@ def client():
     client.connect((hostname, int(port)))
     send_addr = "0" * (4096 - len(addr)) + addr
     client.send(send_addr.encode())
-    data = client.recv(4096)
+    client.recv(1)
     file_size = os.path.getsize(addr)
     send_size = "0" * (13 - len(str(file_size))) + str(file_size)
     client.send(send_size.encode())
-    data = client.recv(13)
+    client.recv(1)
     with open(addr, "r") as f:
-        n = file_size // megabyte
+        n = file_size // gigabyte
         for i in range(n):
-            message = f.read(megabyte)
+            message = f.read(gigabyte)
             client.send(message.encode())
-            data = client.recv(megabyte)
-        if file_size % megabyte != 0:
-            message = f.read(file_size % megabyte)
+            client.recv(1)
+        if file_size % gigabyte != 0:
+            message = f.read(file_size % gigabyte)
             client.send(message.encode())
-            data = client.recv(megabyte)
+            client.recv(1)
         print("Server sent all")
         client.close()
 
