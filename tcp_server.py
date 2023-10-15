@@ -4,7 +4,7 @@ from sys import argv
 import os
 import time
 from pathlib import Path
-gigabyte = 1024 * 1024 * 1024
+megabyte = 1024 * 1024
 
 
 def parse(text):
@@ -23,7 +23,7 @@ def client_thread(con):
     file_size = parse(message)
     con.send("1".encode())
     file_size = int(file_size)
-    n = file_size // gigabyte
+    n = file_size // megabyte
     seconds_init = time.time()
     sec_in = seconds_init
     res_data = 0
@@ -31,17 +31,16 @@ def client_thread(con):
     fdir.mkdir(parents=True, exist_ok=True)
     with open("uploads\\" + addr, "a") as f:
         for i in range(n):
-            data = con.recv(gigabyte)
+            data = con.recv(megabyte)
             message = data.decode()
             f.write(message)
             con.send("1".encode())
-            res_data += 1
-            if (time.time() - sec_in) // 60 >= 3:
-                print((i - res_data) / 180, "GB/s")
+            if (time.time() - sec_in) >= 3:
+                print((i - res_data) / 3, "MB/s")
                 res_data = i
                 sec_in = time.time()
-        if file_size % gigabyte != 0:
-            data = con.recv(gigabyte)
+        if file_size % megabyte != 0:
+            data = con.recv(megabyte)
             message = data.decode()
             f.write(message)
             con.send("1".encode())
@@ -50,14 +49,14 @@ def client_thread(con):
         print("data has received")
     else:
         print("data hasn't received")
-    print("Speed:", int(file_size_end / ((time.time() - seconds_init) * gigabyte)), "GB/s")
+    print("Speed:", int(n / (time.time() - seconds_init)), "MB/s")
     con.close()
 
 
 if __name__ == "__main__":
     script, port = argv
     server = socket.socket()
-    hostname = socket.gethostbyname(socket.gethostname())
+    hostname = "192.168.1.101"
     print(hostname)
     server.bind((hostname, int(port)))
     server.listen(5)
